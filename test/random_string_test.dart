@@ -12,6 +12,14 @@ void main() {
       expect(generateRandomString(32).length, 32);
     });
 
+    test('returns an empty string for length 0', () {
+      expect(generateRandomString(0), '');
+    });
+
+    test('throws ArgumentError for a negative length', () {
+      expect(() => generateRandomString(-1), throwsArgumentError);
+    });
+
     test('only uses characters from the documented charset', () {
       final result = generateRandomString(512);
 

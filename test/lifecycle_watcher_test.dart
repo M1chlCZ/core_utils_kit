@@ -9,6 +9,10 @@ class _LifecycleProbe extends StatefulWidget {
   State<_LifecycleProbe> createState() => _LifecycleProbeState();
 }
 
+// `WidgetsBindingObserver` must precede `LifecycleWatcher`: the mixin's `on`
+// clause requires the host to implement the observer interface, so the
+// reversed order is rejected at compile time with
+// `mixin_application_not_implemented_interface`.
 class _LifecycleProbeState extends State<_LifecycleProbe>
     with WidgetsBindingObserver, LifecycleWatcher<_LifecycleProbe> {
   final List<String> hooks = <String>[];

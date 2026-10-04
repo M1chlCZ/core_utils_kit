@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:core_utils_kit/core_utils_kit.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:intl/date_symbol_data_local.dart';
@@ -11,20 +9,14 @@ void main() {
   });
 
   group('DateFormats.utcDayStart', () {
-    test('returns the start of the local day in the expected pattern', () {
+    test('returns the local start of day converted to UTC', () {
       final result = DateFormats.utcDayStart();
+      final now = DateTime.now();
+      final expected = DateFormat(
+        'yyyy-MM-dd HH:mm:ss',
+      ).format(DateTime(now.year, now.month, now.day).toUtc());
 
-      expect(result, matches(RegExp(r'^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$')));
-
-      final parsed = DateFormat('yyyy-MM-dd HH:mm:ss').parse(result, true);
-      final today = DateTime.now().toUtc();
-      final dateDelta = DateTime.utc(
-        parsed.year,
-        parsed.month,
-        parsed.day,
-      ).difference(DateTime.utc(today.year, today.month, today.day)).inDays;
-
-      expect(dateDelta.abs(), lessThanOrEqualTo(1));
+      expect(result, expected);
     });
   });
 
@@ -56,25 +48,57 @@ void main() {
   });
 
   group('DateFormats.convertDate', () {
-    test('formats a known UTC timestamp in the current locale', () {
-      const iso = '2024-03-15T10:30:00Z';
-
-      expect(DateFormats.convertDate(iso), _expectedConvertDate(iso));
+    test('returns an empty string for null input', () {
+      expect(DateFormats.convertDate(null), '');
     });
 
-    test('formats a timestamp with an explicit offset', () {
-      const iso = '2024-11-02T23:45:00+02:00';
+    test('formats a local timestamp with a fixed expected value', () {
+      expect(
+        DateFormats.convertDate('2024-03-15T10:30:00', 'en_US'),
+        '3/15/2024 10:30\u202fAM',
+      );
+    });
 
-      expect(DateFormats.convertDate(iso), _expectedConvertDate(iso));
+    test('converts a UTC timestamp to local time', () {
+      const iso = '2024-03-15T10:30:00Z';
+
+      expect(DateFormats.convertDate(iso, 'en_US'), _expected(iso, 'en_US'));
+    });
+
+    test('handles a fractional +05:30 offset', () {
+      const iso = '2024-06-01T09:15:00+05:30';
+
+      expect(DateFormats.convertDate(iso, 'en_US'), _expected(iso, 'en_US'));
+    });
+
+    test('handles a negative -04:00 offset', () {
+      const iso = '2024-11-02T23:45:00-04:00';
+
+      expect(DateFormats.convertDate(iso, 'en_US'), _expected(iso, 'en_US'));
+    });
+
+    test('uses the offset at the parsed instant across DST changes', () {
+      const iso = '2024-01-15T12:00:00Z';
+
+      expect(DateFormats.convertDate(iso, 'en_US'), _expected(iso, 'en_US'));
+    });
+
+    test('formats non-English locales after initialization', () {
+      const iso = '2024-03-15T10:30:00Z';
+
+      expect(DateFormats.convertDate(iso, 'de_DE'), _expected(iso, 'de_DE'));
+    });
+
+    test('uses Intl.defaultLocale when no locale is given', () {
+      final previous = Intl.defaultLocale;
+      Intl.defaultLocale = 'de_DE';
+      addTearDown(() => Intl.defaultLocale = previous);
+      const iso = '2024-03-15T10:30:00';
+
+      expect(DateFormats.convertDate(iso), _expected(iso, 'de_DE'));
     });
   });
 }
 
-String _expectedConvertDate(String iso) {
-  final dt = DateTime.parse(iso);
-  final now = DateTime.now();
-  final fixed = now.timeZoneOffset.isNegative
-      ? dt.subtract(Duration(hours: now.timeZoneOffset.inHours))
-      : dt.add(Duration(hours: now.timeZoneOffset.inHours));
-  return DateFormat.yMd(Platform.localeName).add_jm().format(fixed);
-}
+String _expected(String iso, String locale) =>
+    DateFormat.yMd(locale).add_jm().format(DateTime.parse(iso).toLocal());

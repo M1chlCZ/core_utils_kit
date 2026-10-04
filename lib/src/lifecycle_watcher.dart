@@ -2,8 +2,11 @@ import 'package:flutter/widgets.dart';
 
 /// Mixes app lifecycle callbacks into a [State].
 ///
-/// Apply [WidgetsBindingObserver] before this mixin so the default observer
-/// implementations are available:
+/// Apply [WidgetsBindingObserver] before this mixin. The `on` clause below
+/// requires the host class to implement [WidgetsBindingObserver], so the
+/// compiler enforces that order and rejects the reversed one with
+/// `mixin_application_not_implemented_interface` instead of silently replacing
+/// [didChangeAppLifecycleState] with the observer's no-op default:
 ///
 /// ```dart
 /// class _MyWidgetState extends State<MyWidget>
@@ -17,8 +20,8 @@ import 'package:flutter/widgets.dart';
 ///
 /// This mixin fixes the swapped mapping of the original app implementation:
 /// `inactive` maps to [onAppInactive] and `paused` maps to [onAppPaused].
-mixin LifecycleWatcher<T extends StatefulWidget> on State<T>
-    implements WidgetsBindingObserver {
+mixin LifecycleWatcher<T extends StatefulWidget>
+    on State<T>, WidgetsBindingObserver {
   @override
   void initState() {
     super.initState();

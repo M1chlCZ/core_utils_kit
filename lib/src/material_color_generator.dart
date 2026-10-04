@@ -4,8 +4,9 @@ import 'package:flutter/material.dart';
 
 /// Builds a [MaterialColor] swatch from [color].
 ///
-/// Shade 500 is [color] itself, lighter shades are tints, and darker shades
-/// are shades. Factors match the original app utility.
+/// Shade 500 is [color] itself, including its alpha. Every other shade is
+/// derived with [tintColor] or [shadeColor], which force alpha to 1. Factors
+/// match the original app utility.
 MaterialColor generateMaterialColor(Color color) {
   return MaterialColor(color.toARGB32(), <int, Color>{
     50: tintColor(color, 0.9),

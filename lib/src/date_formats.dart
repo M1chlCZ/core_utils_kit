@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:intl/intl.dart';
 
 /// Date and duration formatting helpers.
@@ -32,20 +30,25 @@ class DateFormats {
     return DateFormat('yyyy-MM-dd HH:mm:ss').format(DateTime.parse(val));
   }
 
-  /// Formats [date] in the current platform locale.
+  /// Formats [date] in [locale], or in the current locale when [locale] is
+  /// omitted.
   ///
-  /// [date] must be an ISO-8601 string accepted by [DateTime.parse]. The
-  /// result includes the date and the time of day.
-  static String convertDate(String? date) {
-    final DateTime dt = DateTime.parse(date!);
-    final DateTime dateNow = DateTime.now();
-    final DateTime fix;
-    if (dateNow.timeZoneOffset.isNegative) {
-      fix = dt.subtract(Duration(hours: dateNow.timeZoneOffset.inHours));
-    } else {
-      fix = dt.add(Duration(hours: dateNow.timeZoneOffset.inHours));
+  /// [date] must be an ISO-8601 string accepted by [DateTime.parse]. The value
+  /// is converted with [DateTime.toLocal] before formatting, so explicit UTC
+  /// offsets, fractional offsets, and daylight-saving transitions are handled
+  /// correctly. Returns an empty string when [date] is `null`.
+  ///
+  /// Locales other than `en` require their date symbol data to be initialized
+  /// first, for example with `initializeDateFormatting(locale)` from
+  /// `package:intl/date_symbol_data_local.dart`.
+  static String convertDate(String? date, [String? locale]) {
+    if (date == null) {
+      return '';
     }
-    return DateFormat.yMd(Platform.localeName).add_jm().format(fix);
+    final DateTime local = DateTime.parse(date).toLocal();
+    return DateFormat.yMd(
+      locale ?? Intl.getCurrentLocale(),
+    ).add_jm().format(local);
   }
 
   /// Formats [d] as `d:h:m:s` tokens.

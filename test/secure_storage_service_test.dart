@@ -3,21 +3,23 @@ import 'package:flutter/services.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter_test/flutter_test.dart';
 
+typedef _Call = ({
+  String name,
+  AppleOptions? iOptions,
+  AndroidOptions? aOptions,
+});
+
 class _RecordingSecureStorage extends FlutterSecureStorage {
   _RecordingSecureStorage();
 
-  final List<String> calls = <String>[];
-  AppleOptions? lastIOptions;
-  AndroidOptions? lastAOptions;
+  final List<_Call> calls = <_Call>[];
 
   void _record(
     String call, {
     AppleOptions? iOptions,
     AndroidOptions? aOptions,
   }) {
-    calls.add(call);
-    lastIOptions = iOptions;
-    lastAOptions = aOptions;
+    calls.add((name: call, iOptions: iOptions, aOptions: aOptions));
   }
 
   @override
@@ -74,6 +76,21 @@ class _RecordingSecureStorage extends FlutterSecureStorage {
   }
 }
 
+class _NullReadSecureStorage extends FlutterSecureStorage {
+  const _NullReadSecureStorage();
+
+  @override
+  Future<String?> read({
+    required String key,
+    AppleOptions? iOptions,
+    AndroidOptions? aOptions,
+    LinuxOptions? lOptions,
+    WebOptions? webOptions,
+    AppleOptions? mOptions,
+    WindowsOptions? wOptions,
+  }) async => null;
+}
+
 class _ThrowingSecureStorage extends FlutterSecureStorage {
   const _ThrowingSecureStorage();
 
@@ -128,30 +145,80 @@ void main() {
       expect(SecureStorageService(), isA<KeyValueStore>());
     });
 
+    test('exposes the underlying FlutterSecureStorage', () {
+      final storage = _RecordingSecureStorage();
+
+      expect(SecureStorageService(storage: storage).storage, same(storage));
+    });
+
+    test('forwards calls to the injected storage', () async {
+      final storage = _RecordingSecureStorage();
+      final service = SecureStorageService(storage: storage);
+
+      expect(await service.read('token'), 'value:token');
+      await service.write('token', 'abc');
+      await service.delete('token');
+      await service.deleteAll();
+
+      expect(storage.calls.map((call) => call.name), [
+        'read:token',
+        'write:token=abc',
+        'delete:token',
+        'deleteAll',
+      ]);
+    });
+
     test(
-      'forwards calls to the injected storage with secure options',
+      'defaults to first_unlock on iOS and resetOnError false on Android',
       () async {
         final storage = _RecordingSecureStorage();
         final service = SecureStorageService(storage: storage);
 
-        expect(await service.read('token'), 'value:token');
-        await service.write('token', 'abc');
-        await service.delete('token');
-        await service.deleteAll();
+        await service.read('token');
 
-        expect(storage.calls, [
-          'read:token',
-          'write:token=abc',
-          'delete:token',
-          'deleteAll',
-        ]);
+        final call = storage.calls.single;
+        expect(call.iOptions, isA<IOSOptions>());
         expect(
-          storage.lastIOptions?.accessibility,
+          call.iOptions?.accessibility,
           KeychainAccessibility.first_unlock,
         );
-        expect(storage.lastAOptions, isA<AndroidOptions>());
+        expect(call.aOptions, isA<AndroidOptions>());
+        expect(call.aOptions?.toMap()['resetOnError'], 'false');
       },
     );
+
+    test('passes the injected options to every storage call', () async {
+      const ios = IOSOptions(accessibility: KeychainAccessibility.unlocked);
+      const android = AndroidOptions(
+        resetOnError: true,
+        preferencesKeyPrefix: 'rb',
+      );
+      final storage = _RecordingSecureStorage();
+      final service = SecureStorageService(
+        storage: storage,
+        iOptions: ios,
+        aOptions: android,
+      );
+
+      await service.read('a');
+      await service.write('b', 'value');
+      await service.delete('c');
+      await service.deleteAll();
+
+      expect(storage.calls, hasLength(4));
+      for (final call in storage.calls) {
+        expect(identical(call.iOptions, ios), isTrue);
+        expect(identical(call.aOptions, android), isTrue);
+      }
+    });
+
+    test('read returns null when the storage holds no value', () async {
+      final service = SecureStorageService(
+        storage: const _NullReadSecureStorage(),
+      );
+
+      expect(await service.read('missing'), isNull);
+    });
 
     test('round-trips values through the default storage', () async {
       FlutterSecureStorage.setMockInitialValues(<String, String>{});
