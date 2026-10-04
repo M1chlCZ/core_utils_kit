@@ -1,0 +1,22 @@
+name: core_utils_kit
+description: >-
+  Small Flutter utilities: secure key-value storage, duration and date
+  formatting, material color generation, URL opening, and app lifecycle
+  watching without extra state-management dependencies.
+version: 0.1.0
+repository: https://github.com/M1chlCZ/Rocketbot-App-New/tree/main/packages/core_utils_kit
+issue_tracker: https://github.com/M1chlCZ/Rocketbot-App-New/issues
+topics:
+  - utilities
+  - storage
+  - extensions
+  - lifecycle
+environment:
+  sdk: ^3.11.0
+dependencies:
+  flutter:
+    sdk: flutter
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^6.0.0
