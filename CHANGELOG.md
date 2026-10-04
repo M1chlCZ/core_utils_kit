@@ -19,3 +19,6 @@
   `EncryptedSharedPreferences` data on Android, so existing installs reset
   their stored tokens, PIN and preferences once. iOS `first_unlock` data
   remains readable.
+- The one-time Android reset is guarded by a `storage_reset_done` marker so it
+  runs at most once; later launches with unreadable storage proceed logged out
+  instead of wiping again.

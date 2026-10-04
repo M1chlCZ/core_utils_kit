@@ -74,7 +74,11 @@ class _ExampleHomePageState extends State<ExampleHomePage>
 
   @override
   void onAppDetached() {
-    _lifecycleStatus = 'detached';
+    if (mounted) {
+      setState(() {
+        _lifecycleStatus = 'detached';
+      });
+    }
   }
 
   @override

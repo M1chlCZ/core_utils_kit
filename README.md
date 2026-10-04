@@ -61,9 +61,10 @@ expect(await store.read('answer'), '42');
 ```
 
 `SecureStorageService` accepts custom `iOptions` and `aOptions`. The defaults
-are `KeychainAccessibility.first_unlock` on Apple platforms and
+are `KeychainAccessibility.first_unlock` on iOS and
 `AndroidOptions(resetOnError: false)` on Android, so undecryptable Android
-entries are preserved instead of being wiped on error:
+entries are preserved instead of being wiped on error. Only `iOptions` is
+injected, so macOS uses the default `MacOsOptions`:
 
 ```dart
 final KeyValueStore store = SecureStorageService(
@@ -89,7 +90,11 @@ final String clock = const Duration(hours: 5, minutes: 15).toHoursMinutes();
 ```
 
 `convertDate` converts the parsed value with `toLocal`, so daylight-saving
-transitions and explicit or fractional UTC offsets are handled correctly.
+transitions and explicit or fractional UTC offsets are handled correctly. When
+`locale` is omitted it defaults to `Intl.getCurrentLocale()`, which is usually
+`en_US` unless `Intl.defaultLocale` or the system locale has been set; the
+Rocketbot app deliberately passes `Platform.localeName` for device-locale
+dates.
 
 ### Lifecycle watching
 
@@ -166,10 +171,14 @@ keychain or credential store; on Linux it needs `libsecret`.
 `flutter_secure_storage` 11 changed the Android backend. It cannot read data
 written by version 9 through `EncryptedSharedPreferences`, so existing Android
 installs lose their stored tokens, PIN and preferences once after the upgrade.
-This is an accepted, one-time reset. iOS items written with the `first_unlock`
-accessibility class remain readable because that class is unchanged.
+iOS items written with the `first_unlock` accessibility class remain readable
+because that class is unchanged.
 
-Android errors are not destructive by default: `AndroidOptions(resetOnError:
-false)` keeps undecryptable entries instead of deleting them. If a wipe on
-read error is preferred, inject `aOptions: const AndroidOptions(resetOnError:
-true)`.
+The plugin itself does not reset on errors: with the default
+`AndroidOptions(resetOnError: false)` it keeps undecryptable entries instead of
+deleting them. The one-time reset is performed by the app, which wipes the
+store and writes a `storage_reset_done` marker on first launch. If the marker
+is present but stored data is still unreadable, the app skips the wipe and
+continues logged out, so a persistent read or write failure cannot cause a
+wipe loop. To make the plugin delete on read errors instead, inject
+`aOptions: const AndroidOptions(resetOnError: true)`.
