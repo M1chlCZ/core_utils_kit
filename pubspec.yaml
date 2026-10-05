@@ -4,8 +4,8 @@ description: >-
   formatting, color generation, URL opening, and app lifecycle watching
   without extra state-management dependencies.
 version: 0.1.0
-repository: https://github.com/M1chlCZ/Rocketbot-App-New/tree/main/packages/core_utils_kit
-issue_tracker: https://github.com/M1chlCZ/Rocketbot-App-New/issues
+repository: https://github.com/M1chlCZ/core_utils_kit
+issue_tracker: https://github.com/M1chlCZ/core_utils_kit/issues
 topics:
   - utilities
   - storage
