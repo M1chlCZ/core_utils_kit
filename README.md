@@ -182,3 +182,13 @@ is present but stored data is still unreadable, the app skips the wipe and
 continues logged out, so a persistent read or write failure cannot cause a
 wipe loop. To make the plugin delete on read errors instead, inject
 `aOptions: const AndroidOptions(resetOnError: true)`.
+
+## Example
+
+A runnable app that demonstrates the store, the date and duration helpers, and
+the lifecycle hooks lives in [`example/`](example/).
+
+## Screenshot
+
+A screenshot for the pub.dev listing is not included yet. Run the example app
+to see the store and lifecycle demos.
