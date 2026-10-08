@@ -1,3 +1,8 @@
+## 0.1.1
+
+- Rewrite the README. The install section now uses
+  `flutter pub add core_utils_kit`.
+
 ## 0.1.0
 
 - Initial release.

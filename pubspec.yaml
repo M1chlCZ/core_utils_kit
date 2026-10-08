@@ -3,7 +3,7 @@ description: >-
   Small Flutter utilities: secure key-value storage, date and time
   formatting, color generation, URL opening, and app lifecycle watching
   without extra state-management dependencies.
-version: 0.1.0
+version: 0.1.1
 repository: https://github.com/M1chlCZ/core_utils_kit
 issue_tracker: https://github.com/M1chlCZ/core_utils_kit/issues
 topics:
