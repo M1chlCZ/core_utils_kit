@@ -4,9 +4,9 @@ import 'package:flutter/material.dart';
 
 /// Builds a [MaterialColor] swatch from [color].
 ///
-/// Shade 500 is [color] itself, including its alpha. Every other shade is
-/// derived with [tintColor] or [shadeColor], which force alpha to 1. Factors
-/// match the original app utility.
+/// Shade 500 is [color] itself, including its alpha. The helper derives every
+/// other shade with [tintColor] or [shadeColor], which force alpha to 1. The
+/// factors match the original app utility.
 MaterialColor generateMaterialColor(Color color) {
   return MaterialColor(color.toARGB32(), <int, Color>{
     50: tintColor(color, 0.9),
@@ -22,11 +22,12 @@ MaterialColor generateMaterialColor(Color color) {
   });
 }
 
-/// Mixes [value] toward 255 by [factor], clamped to `0..255`.
+/// Mixes [value] toward 255 by [factor]. The result stays in the `0..255`
+/// range.
 int tintValue(int value, double factor) =>
     max(0, min((value + ((255 - value) * factor)).round(), 255));
 
-/// Returns [color] with every channel lightened by [factor].
+/// Lightens every channel of [color] by [factor].
 Color tintColor(Color color, double factor) => Color.fromRGBO(
   tintValue(_red(color), factor),
   tintValue(_green(color), factor),
@@ -34,11 +35,11 @@ Color tintColor(Color color, double factor) => Color.fromRGBO(
   1,
 );
 
-/// Darkens [value] by [factor], clamped to `0..255`.
+/// Darkens [value] by [factor]. The result stays in the `0..255` range.
 int shadeValue(int value, double factor) =>
     max(0, min(value - (value * factor).round(), 255));
 
-/// Returns [color] with every channel darkened by [factor].
+/// Darkens every channel of [color] by [factor].
 Color shadeColor(Color color, double factor) => Color.fromRGBO(
   shadeValue(_red(color), factor),
   shadeValue(_green(color), factor),

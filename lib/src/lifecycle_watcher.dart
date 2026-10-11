@@ -3,9 +3,9 @@ import 'package:flutter/widgets.dart';
 /// Mixes app lifecycle callbacks into a [State].
 ///
 /// Apply [WidgetsBindingObserver] before this mixin. The `on` clause below
-/// requires the host class to implement [WidgetsBindingObserver], so the
-/// compiler enforces that order and rejects the reversed one with
-/// `mixin_application_not_implemented_interface` instead of silently replacing
+/// requires the host class to implement [WidgetsBindingObserver]. The compiler
+/// enforces that order: the reversed order fails with
+/// `mixin_application_not_implemented_interface`. It does not silently replace
 /// [didChangeAppLifecycleState] with the observer's no-op default:
 ///
 /// ```dart
@@ -50,21 +50,22 @@ mixin LifecycleWatcher<T extends StatefulWidget>
     }
   }
 
-  /// Called when the app is visible and interactive again.
+  /// The mixin calls this hook when the app is visible and interactive again.
   void onAppResumed() {}
 
-  /// Called when the app is visible but no longer has input focus.
+  /// The mixin calls this hook when the app is visible but no longer has input
+  /// focus.
   void onAppInactive() {}
 
-  /// Called when the app is no longer visible.
+  /// The mixin calls this hook when the app is no longer visible.
   void onAppPaused() {}
 
-  /// Called when the app is detached from its host view.
+  /// The mixin calls this hook when the app detaches from its host view.
   void onAppDetached() {}
 
-  /// Called when the app is hidden but not yet paused.
+  /// The mixin calls this hook when the app is hidden but not yet paused.
   ///
-  /// The original app implementation ignored this state; it is exposed here
+  /// The original app implementation ignored this state; this mixin exposes it
   /// as an empty hook so callers can react to it.
   void onAppHidden() {}
 }

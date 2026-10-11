@@ -4,27 +4,28 @@ import 'key_value_store.dart';
 
 /// A [KeyValueStore] backed by [FlutterSecureStorage].
 ///
-/// Platform errors, such as a missing plugin or a locked keychain, are
-/// swallowed: reads return `null` and writes, deletes, and clear operations
-/// become no-ops. This matches the tolerant behavior of the original app
-/// storage helper while also handling asynchronous platform failures.
+/// The service swallows platform errors, such as a missing plugin or a locked
+/// keychain. Reads return `null`; writes, deletes, and clear operations become
+/// no-ops. This behavior matches the tolerant original storage helper and
+/// handles asynchronous platform failures.
 ///
-/// iOS items are stored with [KeychainAccessibility.first_unlock] and Android
-/// uses `AndroidOptions(resetOnError: false)` by default, so undecryptable
-/// Android data is preserved instead of being wiped when an error is
-/// detected. Both options can be overridden through the constructor and are
-/// forwarded on every call.
+/// The service stores iOS items with [KeychainAccessibility.first_unlock]. On
+/// Android, the default `AndroidOptions(resetOnError: false)` keeps
+/// undecryptable data instead of wiping it on error. You can override both
+/// options through the constructor, and the service forwards them on every
+/// call.
 ///
 /// `flutter_secure_storage` 11.x cannot read data written by 9.x on Android
 /// through EncryptedSharedPreferences; the Android store resets once. This
-/// package accepts that one-time reset. On iOS the `first_unlock`
-/// accessibility class is unchanged, so existing items remain readable.
+/// package accepts that one-time reset. The iOS `first_unlock` accessibility
+/// class stays unchanged, so existing items remain readable.
 class SecureStorageService implements KeyValueStore {
   /// Creates a service around [storage].
   ///
-  /// When [storage] is omitted, a default [FlutterSecureStorage] instance is
-  /// created. [iOptions] and [aOptions] default to `first_unlock` on iOS and
-  /// `resetOnError: false` on Android, and are passed on every platform call.
+  /// When you omit [storage], the service creates a default
+  /// [FlutterSecureStorage] instance. [iOptions] and [aOptions] default to
+  /// `first_unlock` on iOS and `resetOnError: false` on Android; the service
+  /// passes both on every platform call.
   SecureStorageService({
     FlutterSecureStorage? storage,
     AppleOptions? iOptions,
@@ -39,7 +40,8 @@ class SecureStorageService implements KeyValueStore {
   final AppleOptions _iOptions;
   final AndroidOptions _aOptions;
 
-  /// The underlying [FlutterSecureStorage] instance used for platform calls.
+  /// Returns the underlying [FlutterSecureStorage] instance for platform
+  /// calls.
   FlutterSecureStorage get storage => _storage;
 
   @override

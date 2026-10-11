@@ -4,11 +4,12 @@ import 'package:intl/intl.dart';
 class DateFormats {
   DateFormats._();
 
-  /// Returns the start of the current local day expressed in UTC and
-  /// formatted as `yyyy-MM-dd HH:mm:ss`.
+  /// Returns the start of the current local day as a UTC string in
+  /// `yyyy-MM-dd HH:mm:ss` format.
   ///
-  /// The value is built from the current local date and timezone offset, then
-  /// parsed and formatted again, matching the original app helper.
+  /// The helper builds the value from the current local date and the current
+  /// timezone offset. It parses and formats the result again, matching the
+  /// original app helper.
   static String utcDayStart() {
     final DateTime dateTime = DateTime.now();
     final String date = DateFormat('yyyy-MM-dd').format(dateTime);
@@ -30,17 +31,17 @@ class DateFormats {
     return DateFormat('yyyy-MM-dd HH:mm:ss').format(DateTime.parse(val));
   }
 
-  /// Formats [date] in [locale], or in the current locale when [locale] is
-  /// omitted.
+  /// Formats [date] in [locale]. When you omit [locale], the method uses the
+  /// current locale.
   ///
-  /// [date] must be an ISO-8601 string accepted by [DateTime.parse]. The value
-  /// is converted with [DateTime.toLocal] before formatting, so explicit UTC
-  /// offsets, fractional offsets, and daylight-saving transitions are handled
-  /// correctly. Returns an empty string when [date] is `null`.
+  /// [date] must be an ISO-8601 string accepted by [DateTime.parse]. The
+  /// method converts the value with [DateTime.toLocal] before formatting, so
+  /// explicit UTC offsets, fractional offsets, and daylight-saving transitions
+  /// work correctly. Returns an empty string when [date] is `null`.
   ///
-  /// Locales other than `en` require their date symbol data to be initialized
-  /// first, for example with `initializeDateFormatting(locale)` from
-  /// `package:intl/date_symbol_data_local.dart`.
+  /// For a locale other than `en`, call `initializeDateFormatting(locale)` from
+  /// `package:intl/date_symbol_data_local.dart` first to load the date symbol
+  /// data.
   static String convertDate(String? date, [String? locale]) {
     if (date == null) {
       return '';
@@ -53,8 +54,8 @@ class DateFormats {
 
   /// Formats [d] as `d:h:m:s` tokens.
   ///
-  /// Leading zero units are omitted, but once a unit is present every smaller
-  /// unit is included. A zero duration formats as `0s`.
+  /// The method omits leading zero units, but includes every smaller unit once
+  /// a unit is present. It formats a zero duration as `0s`.
   static String formatDuration(Duration d) {
     var seconds = d.inSeconds;
     final int days = seconds ~/ Duration.secondsPerDay;

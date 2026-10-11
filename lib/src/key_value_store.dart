@@ -1,17 +1,17 @@
 /// A minimal asynchronous key-value store abstraction.
 ///
-/// Implementations may be backed by secure platform storage, an in-memory
-/// map, or any other persistence layer.
+/// Implementations can use secure platform storage, an in-memory map, or any
+/// other persistence layer.
 abstract interface class KeyValueStore {
-  /// Reads the value stored for [key].
+  /// Reads the value for [key].
   ///
-  /// Returns `null` when no value is stored for [key].
+  /// Returns `null` when the store holds no value for [key].
   Future<String?> read(String key);
 
   /// Stores [value] under [key], replacing any previous value.
   Future<void> write(String key, String value);
 
-  /// Removes the value stored for [key].
+  /// Removes the value for [key].
   ///
   /// Does nothing when [key] is absent.
   Future<void> delete(String key);
@@ -20,10 +20,10 @@ abstract interface class KeyValueStore {
   Future<void> deleteAll();
 }
 
-/// A [KeyValueStore] backed by an in-memory [Map].
+/// A [KeyValueStore] that stores values in an in-memory [Map].
 ///
-/// Values do not survive process restarts. Useful for tests and for
-/// non-persistent caches.
+/// Values do not survive process restarts. Use it in tests and non-persistent
+/// caches.
 class InMemoryKeyValueStore implements KeyValueStore {
   final Map<String, String> _values = <String, String>{};
 
