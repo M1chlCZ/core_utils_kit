@@ -20,3 +20,4 @@ export 'src/relative_time.dart';
 export 'src/retry.dart';
 export 'src/secure_storage_service.dart';
 export 'src/throttler.dart';
+export 'src/validators.dart';
