@@ -7,6 +7,14 @@
   Other locales delegate to `intl`.
 - Add `formatDurationHuman` for compact durations such as `1 h 05 min`,
   `45 min`, and `12 s`.
+- Add `Debouncer`, `Throttler`, and the `debounced` and `throttled`
+  extensions for repeated callbacks.
+- Add `retry` and `RetryPolicy` with attempts, growing waits, jitter, and a
+  `retryOn` filter; `delayFor` keeps tests instant.
+- Add `formatBytes`, `formatCompactNumber`, and `formatPercent`.
+- Add `isValidEmail`, `isValidUrl`, `isValidIban` (MOD-97), and
+  `isValidE164Phone`.
+- Add `initialsOf`, `slugify`, and `truncateAtWord`.
 
 ## 0.1.2
 

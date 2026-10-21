@@ -1,6 +1,7 @@
 /// Small Flutter utilities: secure key-value storage, duration and date
-/// formatting, material color generation, URL opening, and app lifecycle
-/// watching without extra state-management dependencies.
+/// formatting, async helpers, validators, text helpers, material color
+/// generation, URL opening, and app lifecycle watching without extra
+/// state-management dependencies.
 library;
 
 export 'src/build_context_x.dart';
@@ -19,5 +20,6 @@ export 'src/random_string.dart';
 export 'src/relative_time.dart';
 export 'src/retry.dart';
 export 'src/secure_storage_service.dart';
+export 'src/string_helpers.dart';
 export 'src/throttler.dart';
 export 'src/validators.dart';

@@ -20,6 +20,12 @@ package adds no state-management dependency.
 | `generateMaterialColor`, `tintColor`, `shadeColor` | Color helpers. |
 | `openLink` | Opens a `Uri` with fallback launch modes. |
 | `generateRandomString` | Random alphanumeric string of a given length. |
+| `Debouncer`, `Throttler` | Drop repeated calls; the `debounced` and `throttled` extensions wrap callbacks. |
+| `retry`, `RetryPolicy` | Retries a failing future with growing waits and jitter. |
+| `formatBytes` | Binary byte sizes such as `1.5 KiB` and `2.0 MiB`. |
+| `formatCompactNumber`, `formatPercent` | Compact counts such as `1.2k` and percentages such as `25.6 %`. |
+| `isValidEmail`, `isValidUrl`, `isValidIban`, `isValidE164Phone` | Form validators. |
+| `initialsOf`, `slugify`, `truncateAtWord` | Small text helpers. |
 | `BuildContextX.afterBuild` | Runs a callback after the current build. |
 
 ## Install
@@ -118,6 +124,57 @@ class _ScreenState extends State<Screen>
 final bool opened = await openLink(Uri.parse('https://rocket.art'));
 final MaterialColor swatch = generateMaterialColor(const Color(0xFF9BD41E));
 final String nonce = generateRandomString(16);
+```
+
+### Async helpers
+
+`Debouncer` drops calls that arrive before the delay ends, and `Throttler`
+runs at most one call per duration:
+
+```dart
+final debouncer = Debouncer(duration: Duration(milliseconds: 300));
+final throttler = Throttler(duration: Duration(milliseconds: 500));
+
+onChanged: (text) => search(text).debounced(debouncer),
+onScroll: () => refresh().throttled(throttler),
+```
+
+`retry` runs a failing future again with growing waits and jitter. The
+`delayFor` argument replaces the wait, which keeps tests instant:
+
+```dart
+final result = await retry(
+  () => client.fetchPage(1),
+  policy: RetryPolicy(attempts: 4, delay: Duration(milliseconds: 200)),
+);
+```
+
+### Formatting
+
+```dart
+formatBytes(1536); // 1.5 KiB
+formatCompactNumber(3400000); // 3.4M
+formatPercent(0.256); // 25.6 %
+```
+
+### Validators
+
+The validators are shape checks for forms. They do not prove that an address
+or account exists:
+
+```dart
+isValidEmail('ada@example.com'); // true
+isValidUrl('https://example.com'); // true
+isValidIban('CZ65 0800 0000 1920 0014 5399'); // true
+isValidE164Phone('+420601123456'); // true
+```
+
+### Text helpers
+
+```dart
+initialsOf('Ada Lovelace'); // AL
+slugify('Příliš žluťoučký kůň'); // prilis-zlutoucky-kun
+truncateAtWord('The quick brown fox', 12); // The quick…
 ```
 
 ### After build
