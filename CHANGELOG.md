@@ -1,3 +1,13 @@
+## [0.2.0] - 2026-10-22
+
+- Add `formatRelativeTime`. It truncates the difference to a whole unit and
+  reads `5 minutes ago`, `just now`, or `in 2 hours`.
+- Add `formatLongDate`, `formatShortDate`, and `formatShortDateTime`. English
+  and Czech use built-in patterns and need no locale data initialization.
+  Other locales delegate to `intl`.
+- Add `formatDurationHuman` for compact durations such as `1 h 05 min`,
+  `45 min`, and `12 s`.
+
 ## 0.1.2
 
 - Documentation and internal cleanup.

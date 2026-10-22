@@ -42,4 +42,44 @@ void main() {
       );
     });
   });
+
+  group('formatDurationHuman', () {
+    test('formats zero and seconds only', () {
+      expect(formatDurationHuman(Duration.zero), '0 s');
+      expect(formatDurationHuman(const Duration(seconds: 12)), '12 s');
+    });
+
+    test('truncates seconds to whole minutes', () {
+      expect(formatDurationHuman(const Duration(seconds: 90)), '1 min');
+      expect(
+        formatDurationHuman(const Duration(minutes: 59, seconds: 59)),
+        '59 min',
+      );
+    });
+
+    test('formats whole minutes', () {
+      expect(formatDurationHuman(const Duration(minutes: 45)), '45 min');
+    });
+
+    test('pads minutes after hours', () {
+      expect(
+        formatDurationHuman(const Duration(hours: 1, minutes: 5)),
+        '1 h 05 min',
+      );
+      expect(formatDurationHuman(const Duration(hours: 2)), '2 h 00 min');
+      expect(
+        formatDurationHuman(const Duration(hours: 1, minutes: 5, seconds: 30)),
+        '1 h 05 min',
+      );
+    });
+
+    test('keeps a leading minus sign', () {
+      expect(formatDurationHuman(const Duration(seconds: -45)), '-45 s');
+      expect(formatDurationHuman(const Duration(seconds: -90)), '-1 min');
+      expect(
+        formatDurationHuman(const Duration(hours: -1, minutes: -5)),
+        '-1 h 05 min',
+      );
+    });
+  });
 }

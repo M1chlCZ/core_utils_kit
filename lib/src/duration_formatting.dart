@@ -26,3 +26,28 @@ extension DurationFormatting on Duration {
     return '0$n';
   }
 }
+
+/// Formats [duration] as a compact human-readable string.
+///
+/// The function truncates seconds, so 90 seconds read `1 min`. A duration
+/// below one minute reads in seconds, for example `12 s`. A duration below
+/// one hour reads in whole minutes, for example `45 min`. A longer duration
+/// reads in hours and padded minutes, for example `1 h 05 min`. A negative
+/// duration keeps a leading `-`.
+String formatDurationHuman(Duration duration) {
+  final int seconds = duration.inSeconds.abs();
+  final String sign = duration.isNegative ? '-' : '';
+  if (seconds < Duration.secondsPerMinute) {
+    return '$sign$seconds s';
+  }
+  final int minutes = seconds ~/ Duration.secondsPerMinute;
+  if (seconds < Duration.secondsPerHour) {
+    return '$sign$minutes min';
+  }
+  final int hours = minutes ~/ Duration.minutesPerHour;
+  final String paddedMinutes = minutes
+      .remainder(Duration.minutesPerHour)
+      .toString()
+      .padLeft(2, '0');
+  return '$sign$hours h $paddedMinutes min';
+}

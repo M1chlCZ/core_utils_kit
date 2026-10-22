@@ -12,7 +12,10 @@ package adds no state-management dependency.
 | `InMemoryKeyValueStore` | `KeyValueStore` backed by a `Map`. Use it in tests. |
 | `SecureStorageService` | `KeyValueStore` backed by `flutter_secure_storage`. |
 | `DateFormats` | `utcDayStart`, `convertDate`, and `formatDuration`. |
+| `formatRelativeTime` | Short phrases such as `5 minutes ago` or `in 2 hours`. |
+| `formatLongDate`, `formatShortDate`, `formatShortDateTime` | Locale-aware dates. English and Czech need no initialization. |
 | `DurationFormatting` | `toHoursMinutes` and `toHoursMinutesSeconds` extensions. |
+| `formatDurationHuman` | Compact durations such as `1 h 05 min` and `45 min`. |
 | `LifecycleWatcher` | Mixin that forwards app lifecycle events to `onApp*` hooks. |
 | `generateMaterialColor`, `tintColor`, `shadeColor` | Color helpers. |
 | `openLink` | Opens a `Uri` with fallback launch modes. |
@@ -52,6 +55,41 @@ final String clock = const Duration(hours: 5, minutes: 15).toHoursMinutes(); // 
 
 Call `initializeDateFormatting('fi')` before you use a non-English locale.
 When you omit the locale, `convertDate` uses `Intl.getCurrentLocale()`.
+
+`formatDurationHuman` truncates seconds and pads minutes after hours:
+
+```dart
+formatDurationHuman(const Duration(hours: 1, minutes: 5)); // 1 h 05 min
+formatDurationHuman(const Duration(minutes: 45)); // 45 min
+formatDurationHuman(const Duration(seconds: 90)); // 1 min
+formatDurationHuman(const Duration(seconds: 12)); // 12 s
+```
+
+### Relative time
+
+`formatRelativeTime` truncates the difference to a whole unit. A future time
+reads `in X unit`:
+
+```dart
+final now = DateTime(2024, 3, 15, 12);
+formatRelativeTime(DateTime(2024, 3, 15, 11, 45), now: now); // 15 minutes ago
+formatRelativeTime(DateTime(2024, 3, 15, 12, 0, 30), now: now); // just now
+formatRelativeTime(DateTime(2024, 3, 15, 12, 30), now: now); // in 30 minutes
+```
+
+### Locale-aware dates
+
+English and Czech work without locale data. Another locale delegates to
+`intl`, so call `initializeDateFormatting(locale)` first:
+
+```dart
+final date = DateTime(2024, 3, 15, 14, 30);
+formatLongDate(date); // March 15, 2024
+formatLongDate(date, locale: 'cs'); // 15. března 2024
+formatShortDate(date); // 3/15/2024
+formatShortDate(date, locale: 'cs'); // 15. 3. 2024
+formatShortDateTime(date, locale: 'cs'); // 15. 3. 2024 14:30
+```
 
 ### Lifecycle
 
