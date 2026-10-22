@@ -56,6 +56,11 @@ void main() {
       expect(isValidIban('CZ65'), isFalse);
       expect(isValidIban('CZ65 0800 0000 1920 0014 539*'), isFalse);
     });
+
+    test('rejects a structure that only satisfies MOD-97', () {
+      expect(isValidIban('000100000000000'), isFalse);
+      expect(isValidIban('CZ658000000192000145399'), isFalse);
+    });
   });
 
   group('isValidE164Phone', () {

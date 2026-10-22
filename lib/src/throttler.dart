@@ -9,23 +9,28 @@
 class Throttler {
   /// Creates a throttler with the minimum time between two runs.
   ///
-  /// [clock] replaces the current time source, which keeps tests instant.
+  /// The default elapsed source is a monotonic stopwatch, so wall-clock
+  /// changes do not stall or repeat calls. [elapsed] replaces the source,
+  /// which keeps tests instant.
   Throttler({
     this.duration = const Duration(milliseconds: 500),
-    DateTime Function()? clock,
-  }) : _clock = clock ?? DateTime.now;
+    Duration Function()? elapsed,
+  }) {
+    final stopwatch = Stopwatch()..start();
+    _elapsed = elapsed ?? () => stopwatch.elapsed;
+  }
 
   /// Minimum time between two runs of the callback.
   final Duration duration;
 
-  final DateTime Function() _clock;
-  DateTime? _lastRun;
+  late final Duration Function() _elapsed;
+  Duration? _lastRun;
 
   /// Runs [callback] when enough time passed since the last run.
   void call(void Function() callback) {
-    final DateTime now = _clock();
-    final DateTime? last = _lastRun;
-    if (last != null && now.difference(last) < duration) {
+    final Duration now = _elapsed();
+    final Duration? last = _lastRun;
+    if (last != null && now - last < duration) {
       return;
     }
     _lastRun = now;

@@ -1,5 +1,42 @@
 final RegExp _email = RegExp(r'^[^@\s]+@[^@\s]+\.[^@\s]+$');
 final RegExp _e164 = RegExp(r'^\+[1-9][0-9]{1,14}$');
+final RegExp _ibanStructure = RegExp(r'^[A-Z]{2}[0-9]{2}[A-Z0-9]+$');
+
+const Map<String, int> _ibanLengths = <String, int>{
+  'AT': 20,
+  'BE': 16,
+  'BG': 22,
+  'CH': 21,
+  'CY': 28,
+  'CZ': 24,
+  'DE': 22,
+  'DK': 18,
+  'EE': 20,
+  'ES': 24,
+  'FI': 18,
+  'FR': 27,
+  'GB': 22,
+  'GR': 27,
+  'HR': 21,
+  'HU': 28,
+  'IE': 22,
+  'IS': 26,
+  'IT': 27,
+  'LI': 21,
+  'LT': 20,
+  'LU': 20,
+  'LV': 21,
+  'MT': 31,
+  'NL': 18,
+  'NO': 15,
+  'PL': 28,
+  'PT': 25,
+  'RO': 24,
+  'SE': 24,
+  'SI': 19,
+  'SK': 24,
+  'TR': 26,
+};
 
 /// Returns true when [value] looks like an e-mail address.
 ///
@@ -19,12 +56,20 @@ bool isValidUrl(String value) {
 
 /// Returns true when [value] is a valid IBAN in the sense of ISO 13616.
 ///
-/// The check removes spaces, uppercases the text, verifies the length range,
-/// moves the first four characters to the end, and confirms a MOD-97
-/// remainder of one. Example: `CZ65 0800 0000 1920 0014 5399`.
+/// The check removes spaces, uppercases the text, verifies the country code
+/// and check digits, applies the country length when it is known, moves the
+/// first four characters to the end, and confirms a MOD-97 remainder of one.
+/// Example: `CZ65 0800 0000 1920 0014 5399`.
 bool isValidIban(String value) {
   final String compact = value.replaceAll(RegExp(r'\s'), '').toUpperCase();
   if (compact.length < 15 || compact.length > 34) {
+    return false;
+  }
+  if (!_ibanStructure.hasMatch(compact)) {
+    return false;
+  }
+  final int? expectedLength = _ibanLengths[compact.substring(0, 2)];
+  if (expectedLength != null && compact.length != expectedLength) {
     return false;
   }
   final String rearranged = compact.substring(4) + compact.substring(0, 4);

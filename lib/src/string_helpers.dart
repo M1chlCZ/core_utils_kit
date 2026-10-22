@@ -1,3 +1,5 @@
+import 'package:characters/characters.dart';
+
 const Map<String, String> _foldedLetters = <String, String>{
   'á': 'a',
   'à': 'a',
@@ -63,7 +65,10 @@ String initialsOf(String name, {int count = 2}) {
   if (words.isEmpty) {
     return '';
   }
-  return words.take(count).map((String word) => word[0].toUpperCase()).join();
+  return words
+      .take(count)
+      .map((String word) => word.characters.first.toUpperCase())
+      .join();
 }
 
 /// Turns text into a lowercase ASCII slug with single dashes.
@@ -74,7 +79,10 @@ String initialsOf(String name, {int count = 2}) {
 String slugify(String text) {
   final String lower = text.toLowerCase();
   final StringBuffer buffer = StringBuffer();
-  for (final int unit in lower.codeUnits) {
+  for (final int unit in lower.runes) {
+    if (_isCombiningMark(unit)) {
+      continue;
+    }
     final String character = String.fromCharCode(unit);
     final String folded = _foldedLetters[character] ?? character;
     for (final int foldedUnit in folded.codeUnits) {
@@ -98,11 +106,20 @@ String truncateAtWord(String text, int maxLength) {
   if (maxLength <= 0) {
     return '';
   }
-  if (text.length <= maxLength) {
+  final Characters characters = text.characters;
+  if (characters.length <= maxLength) {
     return text;
   }
-  final String prefix = text.substring(0, maxLength);
+  final String prefix = characters.take(maxLength).toString();
   final int space = prefix.lastIndexOf(' ');
   final String cut = space > 0 ? prefix.substring(0, space) : prefix;
   return '${cut.trimRight()}…';
+}
+
+bool _isCombiningMark(int rune) {
+  return (rune >= 0x0300 && rune <= 0x036F) ||
+      (rune >= 0x1AB0 && rune <= 0x1AFF) ||
+      (rune >= 0x1DC0 && rune <= 0x1DFF) ||
+      (rune >= 0x20D0 && rune <= 0x20FF) ||
+      (rune >= 0xFE20 && rune <= 0xFE2F);
 }

@@ -14,6 +14,7 @@ topics:
 environment:
   sdk: ^3.11.0
 dependencies:
+  characters: ^1.4.0
   flutter:
     sdk: flutter
   flutter_secure_storage: ^11.2.0

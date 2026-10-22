@@ -57,4 +57,18 @@ void main() {
       expect(truncateAtWord('Anything', -3), '');
     });
   });
+
+  group('Unicode text', () {
+    test('initialsOf keeps complete characters', () {
+      expect(initialsOf('𠮷田 太郎'), '𠮷太');
+    });
+
+    test('truncateAtWord keeps complete characters', () {
+      expect(truncateAtWord('A😀BC', 2), 'A😀…');
+    });
+
+    test('slugify folds decomposed accents', () {
+      expect(slugify('Při\u0301liš'), 'prilis');
+    });
+  });
 }

@@ -41,25 +41,25 @@ void main() {
 
   group('Throttler', () {
     test('runs once per duration and drops the calls in between', () {
-      var now = DateTime(2026, 1, 1, 12);
+      var elapsed = Duration.zero;
       final throttler = Throttler(
         duration: const Duration(milliseconds: 500),
-        clock: () => now,
+        elapsed: () => elapsed,
       );
       final calls = <int>[];
       throttler(() => calls.add(1));
       throttler(() => calls.add(2));
-      now = now.add(const Duration(milliseconds: 600));
+      elapsed += const Duration(milliseconds: 600);
       throttler(() => calls.add(3));
       throttler(() => calls.add(4));
       expect(calls, <int>[1, 3]);
     });
 
     test('reset makes the next call run immediately', () {
-      var now = DateTime(2026, 1, 1, 12);
+      var elapsed = Duration.zero;
       final throttler = Throttler(
         duration: const Duration(milliseconds: 500),
-        clock: () => now,
+        elapsed: () => elapsed,
       );
       var calls = 0;
       throttler(() => calls++);
@@ -71,10 +71,10 @@ void main() {
     });
 
     test('the throttled extension wraps a callback', () {
-      var now = DateTime(2026, 1, 1, 12);
+      var elapsed = Duration.zero;
       final throttler = Throttler(
         duration: const Duration(seconds: 1),
-        clock: () => now,
+        elapsed: () => elapsed,
       );
       var calls = 0;
       void run() => calls++;
@@ -82,7 +82,7 @@ void main() {
       wrapped();
       wrapped();
       expect(calls, 1);
-      now = now.add(const Duration(seconds: 2));
+      elapsed += const Duration(seconds: 2);
       wrapped();
       expect(calls, 2);
     });
