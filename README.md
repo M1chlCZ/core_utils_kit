@@ -1,8 +1,8 @@
 # core_utils_kit
 
-Small Flutter utilities: secure key-value storage, date and time formatting,
-color generation, URL opening, random strings, and app lifecycle hooks. The
-package adds no state-management dependency.
+Small Flutter utilities for secure key-value storage, date and time formatting,
+color generation, URL opening, random strings and app lifecycle hooks. It adds
+no state-management dependency.
 
 ## Features
 
