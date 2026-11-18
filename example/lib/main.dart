@@ -1,5 +1,5 @@
 import 'package:core_utils_kit/core_utils_kit.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 void main() {
   runApp(const CoreUtilsExampleApp());
